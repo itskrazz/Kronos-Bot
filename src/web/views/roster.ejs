@@ -1,0 +1,42 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="page-heading"><div><span class="eyebrow">PERSONNEL COMMAND</span><h1>Force roster</h1><p>Search, review, and create personnel records.</p></div><a class="button button-primary" href="#add-personnel">Add personnel</a></div>
+    <%- include('partials/flash') %>
+    <section class="panel">
+      <form class="filter-bar" method="get">
+        <label class="grow"><span class="sr-only">Search personnel</span><input type="search" name="search" value="<%= search %>" placeholder="Search member, Roblox name, unit, or specialty"></label>
+        <label><span class="sr-only">Duty status</span><select name="status"><option value="">All statuses</option><option value="active" <%= status === 'active' ? 'selected' : '' %>>Active</option><option value="reserve" <%= status === 'reserve' ? 'selected' : '' %>>Reserve</option><option value="loa" <%= status === 'loa' ? 'selected' : '' %>>LOA</option><option value="retired" <%= status === 'retired' ? 'selected' : '' %>>Retired</option><option value="discharged" <%= status === 'discharged' ? 'selected' : '' %>>Discharged</option></select></label>
+        <button class="button button-secondary" type="submit">Apply</button>
+      </form>
+      <div class="table-wrap"><table><thead><tr><th>Personnel</th><th>Rank</th><th>Unit / Specialty</th><th>Roblox group</th><th>Status</th></tr></thead><tbody>
+        <% if (!roster.length) { %><tr><td colspan="5" class="empty-cell">No records match this view.</td></tr><% } %>
+        <% for (const item of roster) { %>
+          <tr>
+            <td><a class="member-link" href="/dashboard/<%= guild.id %>/personnel/<%= item.discord_user_id %>"><span class="mini-avatar"><%= item.discord_username.slice(0, 1).toUpperCase() %></span><span><strong><%= item.discord_username %></strong><small><%= item.roblox_username || item.discord_user_id %></small></span></a></td>
+            <td><span class="rank-chip"><%= item.rank_code %></span><small class="table-sub"><%= item.rank_name %> • <%= item.rank_paygrade %></small></td>
+            <td><%= item.unit || 'Unassigned' %><small class="table-sub"><%= item.specialty || 'No specialty' %></small></td>
+            <td><%= item.roblox_group_role || 'Not synchronized' %><small class="table-sub"><%= item.roblox_group_rank !== null ? `Rank ${item.roblox_group_rank}` : '—' %></small></td>
+            <td><span class="status status-<%= item.status %>"><%= item.status %></span></td>
+          </tr>
+        <% } %>
+      </tbody></table></div>
+    </section>
+
+    <section id="add-personnel" class="panel form-panel">
+      <div class="panel-heading"><div><span class="eyebrow">NEW RECORD</span><h2>Add personnel</h2></div></div>
+      <form method="post" action="/dashboard/<%= guild.id %>/roster" class="form-grid">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label><span>Discord user ID</span><input name="discord_user_id" required pattern="[0-9]{16,22}" placeholder="123456789012345678"><small>Enable Developer Mode in Discord, then Copy User ID.</small></label>
+        <label><span>Starting rank</span><select name="rank_code" required><% for (const rank of branch.ranks) { %><option value="<%= rank.code %>"><%= rank.paygrade %> • <%= rank.code %> — <%= rank.name %></option><% } %></select></label>
+        <label><span>Unit / command</span><input name="unit" maxlength="100" placeholder="1st Infantry Division"></label>
+        <label><span>MOS / specialty</span><input name="specialty" maxlength="100" placeholder="11B Infantryman"></label>
+        <div class="form-actions full"><button class="button button-primary" type="submit">Create personnel record</button></div>
+      </form>
+    </section>
+  </main>
+</div>
+<%- include('partials/footer') %>
+

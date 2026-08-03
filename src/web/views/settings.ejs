@@ -1,0 +1,62 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="page-heading"><div><span class="eyebrow">SYSTEM CONTROL</span><h1>Configuration</h1><p>Branch identity, Discord permissions, Roblox verification, and rank synchronization.</p></div></div>
+    <%- include('partials/flash') %>
+
+    <form method="post" action="/dashboard/<%= guild.id %>/settings" class="settings-layout">
+      <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+      <section class="panel form-panel">
+        <div class="panel-heading"><div><span class="eyebrow">01 / IDENTITY</span><h2>Command structure</h2></div></div>
+        <div class="form-grid">
+          <label><span>Military branch</span><select name="branch" required><% for (const item of branches) { %><option value="<%= item.id %>" <%= config.branch === item.id ? 'selected' : '' %>><%= item.name %></option><% } %></select><small>Controls the complete rank library and branch appearance.</small></label>
+          <label><span>Organization name</span><input name="organization_name" value="<%= config.organization_name %>" maxlength="100" required></label>
+          <label class="full"><span>Nickname format</span><input name="nickname_format" value="<%= config.nickname_format %>" maxlength="64"><small>Available tokens: {rank}, {roblox}, {username}, {display}, {branch}</small></label>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="panel-heading"><div><span class="eyebrow">02 / DISCORD</span><h2>Roles and logging</h2></div></div>
+        <div class="form-grid">
+          <label><span>Kronos staff roles</span><select name="staff_role_ids" multiple size="6"><% for (const role of roles) { %><option value="<%= role.id %>" <%= config.staff_role_ids?.includes(role.id) ? 'selected' : '' %>><%= role.name %></option><% } %></select><small>Hold Ctrl / Cmd to select multiple roles.</small></label>
+          <div class="stack-form">
+            <label><span>Verified role</span><select name="verified_role_id"><option value="">No verified role</option><% for (const role of roles) { %><option value="<%= role.id %>" <%= config.verified_role_id === role.id ? 'selected' : '' %>><%= role.name %></option><% } %></select></label>
+            <label><span>Audit-log channel</span><select name="log_channel_id"><option value="">No Discord log channel</option><% for (const channel of channels) { %><option value="<%= channel.id %>" <%= config.log_channel_id === channel.id ? 'selected' : '' %>>#<%= channel.name %></option><% } %></select></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel form-panel">
+        <div class="panel-heading"><div><span class="eyebrow">03 / ROBLOX</span><h2>Optional verification</h2></div><label class="switch"><input type="checkbox" name="roblox_enabled" <%= config.roblox_enabled ? 'checked' : '' %>><span></span><b>Enabled</b></label></div>
+        <div class="form-grid">
+          <label><span>Roblox group / community ID</span><input name="roblox_group_id" inputmode="numeric" value="<%= config.roblox_group_id || '' %>" placeholder="Numbers only"><small>Ownership is proven with a temporary profile About code.</small></label>
+          <label><span>Minimum group rank</span><input type="number" name="roblox_min_rank" min="0" max="255" value="<%= config.roblox_min_rank %>"></label>
+          <label class="checkbox-row full"><input type="checkbox" name="roblox_auto_sync" <%= config.roblox_auto_sync ? 'checked' : '' %>><span><strong>Automatic member sync</strong><small>Reapply verification, rank binds, roles, and nicknames when a linked member joins.</small></span></label>
+        </div>
+      </section>
+
+      <div class="sticky-save"><div><strong>Configuration changes are audited.</strong><small>Make sure the bot role is above every role it manages.</small></div><button class="button button-primary" type="submit">Save configuration</button></div>
+    </form>
+
+    <section id="rank-binds" class="panel form-panel rank-binds-panel">
+      <div class="panel-heading"><div><span class="eyebrow">04 / SYNCHRONIZATION</span><h2>Roblox rank binds</h2><p>Exact Roblox group-rank numbers map to a <%= branch.shortName %> rank and optional Discord role.</p></div></div>
+      <form method="post" action="/dashboard/<%= guild.id %>/binds" class="bind-form">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <label><span>Roblox rank</span><input type="number" name="roblox_group_rank" min="0" max="255" required placeholder="1"></label>
+        <label><span>Kronos rank</span><select name="branch_rank_code" required><% for (const rank of branch.ranks) { %><option value="<%= rank.code %>"><%= rank.paygrade %> • <%= rank.code %> — <%= rank.name %></option><% } %></select></label>
+        <label><span>Discord role</span><select name="discord_role_id"><option value="">No role assignment</option><% for (const role of roles) { %><option value="<%= role.id %>"><%= role.name %></option><% } %></select></label>
+        <button class="button button-secondary" type="submit">Add or replace bind</button>
+      </form>
+      <div class="table-wrap"><table><thead><tr><th>Roblox rank</th><th>Kronos rank</th><th>Discord role</th><th></th></tr></thead><tbody>
+        <% if (!binds.length) { %><tr><td colspan="4" class="empty-cell">No rank binds configured. Verification still works without binds.</td></tr><% } %>
+        <% for (const bind of binds) { const mappedRank = branch.ranks.find((rank) => rank.code === bind.branch_rank_code); %>
+          <tr><td><strong><%= bind.roblox_group_rank %></strong></td><td><span class="rank-chip"><%= bind.branch_rank_code %></span><%= mappedRank ? ` ${mappedRank.name}` : ' Invalid for selected branch' %></td><td><%= bind.discord_role_id ? (roles.find((role) => role.id === bind.discord_role_id)?.name || bind.discord_role_id) : 'No role' %></td><td class="right"><form method="post" action="/dashboard/<%= guild.id %>/binds/<%= bind.roblox_group_rank %>/delete" data-confirm="Remove this rank bind?"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button class="button button-danger button-small" type="submit">Remove</button></form></td></tr>
+        <% } %>
+      </tbody></table></div>
+    </section>
+  </main>
+</div>
+<%- include('partials/footer') %>
+

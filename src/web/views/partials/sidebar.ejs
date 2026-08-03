@@ -1,0 +1,29 @@
+<aside class="sidebar" aria-label="Kronos sections">
+  <div class="command-mark">
+    <span class="eyebrow"><%= branch.abbreviation %> COMMAND</span>
+    <strong><%= config.organization_name %></strong>
+    <small><%= guild.name %></small>
+  </div>
+  <nav>
+    <a class="<%= currentPath === `/dashboard/${guild.id}` ? 'active' : '' %>" href="/dashboard/<%= guild.id %>">
+      <span>Overview</span><small>01</small>
+    </a>
+    <a class="<%= currentPath.includes('/roster') || currentPath.includes('/personnel/') ? 'active' : '' %>" href="/dashboard/<%= guild.id %>/roster">
+      <span>Personnel</span><small>02</small>
+    </a>
+    <a class="<%= currentPath.includes('/loas') ? 'active' : '' %>" href="/dashboard/<%= guild.id %>/loas">
+      <span>Leave</span><small>03</small>
+    </a>
+    <a class="<%= currentPath.includes('/audit') ? 'active' : '' %>" href="/dashboard/<%= guild.id %>/audit">
+      <span>Audit Log</span><small>04</small>
+    </a>
+    <a class="<%= currentPath.includes('/settings') ? 'active' : '' %>" href="/dashboard/<%= guild.id %>/settings">
+      <span>Configuration</span><small>05</small>
+    </a>
+  </nav>
+  <div class="sidebar-status">
+    <span class="status-dot"></span>
+    <div><strong>System online</strong><small><%= branch.name %></small></div>
+  </div>
+</aside>
+

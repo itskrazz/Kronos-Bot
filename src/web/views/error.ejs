@@ -1,0 +1,11 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<main id="main-content" class="page-container error-page">
+  <span class="brand-shield large">!</span>
+  <span class="eyebrow">KRONOS SYSTEM NOTICE</span>
+  <h1><%= title %></h1>
+  <p><%= message %></p>
+  <div class="hero-actions"><a class="button button-primary" href="<%= user ? '/dashboard' : '/' %>">Return to dashboard</a><button class="button button-secondary" type="button" data-go-back>Go back</button></div>
+</main>
+<%- include('partials/footer') %>
+

@@ -1,0 +1,21 @@
+<header class="topbar">
+  <a class="brand" href="<%= user ? '/dashboard' : '/' %>" aria-label="Kronos home">
+    <span class="brand-shield">K</span>
+    <span>
+      <strong>KRONOS</strong>
+      <small>Military Management</small>
+    </span>
+  </a>
+  <nav class="topbar-actions" aria-label="Account navigation">
+    <% if (user) { %>
+      <span class="user-chip"><%= user.globalName || user.username %></span>
+      <form action="/logout" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+        <button class="button button-quiet button-small" type="submit">Log out</button>
+      </form>
+    <% } else { %>
+      <a class="button button-primary button-small" href="/auth/discord">Sign in with Discord</a>
+    <% } %>
+  </nav>
+</header>
+

@@ -1,0 +1,57 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<main id="main-content">
+  <section class="hero">
+    <div class="hero-copy">
+      <span class="eyebrow">DISCORD + WEB COMMAND SYSTEM</span>
+      <h1>Accountability.<br><em>Without the paperwork.</em></h1>
+      <p>Kronos is a complete personnel system for U.S. military Roblox communities—built around Discord, backed by a secure web dashboard, and ready for optional Roblox group verification.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="<%= authenticated ? '/dashboard' : '/auth/discord' %>"><%= authenticated ? 'Open command dashboard' : 'Continue with Discord' %></a>
+        <a class="button button-secondary" href="<%= botInviteUrl %>">Install bot</a>
+      </div>
+      <div class="trust-row">
+        <span><b>06</b> service branches</span>
+        <span><b>07</b> command groups</span>
+        <span><b>0</b> Roblox scripts required</span>
+      </div>
+    </div>
+    <div class="hero-console" aria-label="Kronos system preview">
+      <div class="console-head"><span>KRONOS // PERSONNEL READINESS</span><span class="live">LIVE</span></div>
+      <div class="radar-mark"><span>K</span></div>
+      <div class="console-grid">
+        <div><small>ACTIVE FORCE</small><strong>248</strong><span>+12 this month</span></div>
+        <div><small>VERIFIED</small><strong>94%</strong><span>Roblox linked</span></div>
+        <div><small>ON LEAVE</small><strong>07</strong><span>3 pending</span></div>
+        <div><small>READINESS</small><strong>A+</strong><span>All systems nominal</span></div>
+      </div>
+      <div class="scan-line"></div>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-heading">
+      <span class="eyebrow">ONE SYSTEM. EVERY BRANCH.</span>
+      <h2>Built for your command structure.</h2>
+      <p>Each server selects its branch and immediately gets the correct rank library, terminology, colors, and promotion records.</p>
+    </div>
+    <div class="branch-grid">
+      <% for (const item of branches) { %>
+        <article class="branch-card">
+          <span><%= item.abbreviation %></span>
+          <h3><%= item.shortName %></h3>
+          <p><%= item.motto %></p>
+          <small><%= item.ranks.length %> rank options</small>
+        </article>
+      <% } %>
+    </div>
+  </section>
+
+  <section class="feature-band">
+    <article><span>01</span><h3>Personnel records</h3><p>Ranks, units, specialties, status, awards, training, discipline, and full service history.</p></article>
+    <article><span>02</span><h3>Roblox verification</h3><p>Profile challenge, group membership, group-rank binds, Discord roles, and nickname synchronization.</p></article>
+    <article><span>03</span><h3>Command oversight</h3><p>Discord OAuth access, LOA decisions, searchable audit logs, and REST read endpoints.</p></article>
+  </section>
+</main>
+<%- include('partials/footer') %>
+

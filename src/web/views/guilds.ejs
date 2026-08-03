@@ -1,0 +1,28 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<main id="main-content" class="page-container">
+  <div class="page-heading wide-heading">
+    <div><span class="eyebrow">COMMAND ACCESS</span><h1>Select a server</h1><p>Servers where you have Manage Server are listed below.</p></div>
+    <a class="button button-secondary" href="<%= botInviteUrl %>">Install Kronos</a>
+  </div>
+  <%- include('partials/flash') %>
+  <% if (!guilds.length) { %>
+    <section class="empty-state"><span class="brand-shield large">K</span><h2>No manageable servers found</h2><p>Create a Discord server or ask for Manage Server permission, then sign in again.</p></section>
+  <% } else { %>
+    <div class="guild-grid">
+      <% for (const item of guilds) { %>
+        <article class="guild-card <%= item.installed ? '' : 'muted' %>">
+          <div class="guild-icon"><%= item.name.slice(0, 2).toUpperCase() %></div>
+          <div class="guild-copy"><span class="eyebrow"><%= item.branch?.abbreviation ?? 'DISCORD COMMAND' %></span><h2><%= item.name %></h2><p><%= item.config?.organization_name ?? 'Not configured' %></p></div>
+          <% if (item.installed) { %>
+            <a class="button button-primary" href="/dashboard/<%= item.id %>">Open dashboard</a>
+          <% } else { %>
+            <a class="button button-secondary" href="<%= botInviteUrl %>">Install bot</a>
+          <% } %>
+        </article>
+      <% } %>
+    </div>
+  <% } %>
+</main>
+<%- include('partials/footer') %>
+

@@ -1,0 +1,26 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="page-heading"><div><span class="eyebrow">LEAVE CONTROL</span><h1>Leave of absence</h1><p>Review and decide personnel leave requests.</p></div></div>
+    <%- include('partials/flash') %>
+    <section class="panel">
+      <div class="table-wrap"><table><thead><tr><th>Request</th><th>Personnel</th><th>Dates</th><th>Reason</th><th>Status / Decision</th></tr></thead><tbody>
+        <% if (!loas.length) { %><tr><td colspan="5" class="empty-cell">No LOA requests have been submitted.</td></tr><% } %>
+        <% for (const item of loas) { %>
+          <tr><td><strong>#<%= item.id %></strong><small class="table-sub"><%= formatDate(item.created_at) %></small></td><td><strong><%= names[item.discord_user_id] || item.discord_user_id %></strong></td><td><%= formatDate(item.starts_on) %><small class="table-sub">through <%= formatDate(item.ends_on) %></small></td><td class="reason-cell"><%= item.reason %></td><td>
+            <% if (item.status === 'pending') { %>
+              <form class="decision-form" method="post" action="/dashboard/<%= guild.id %>/loas/<%= item.id %>">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>"><input name="reason" maxlength="500" placeholder="Decision note">
+                <button class="button button-success button-small" name="decision" value="approved">Approve</button><button class="button button-danger button-small" name="decision" value="denied">Deny</button>
+              </form>
+            <% } else { %><span class="status status-<%= item.status %>"><%= item.status %></span><small class="table-sub"><%= item.decision_reason || '' %></small><% } %>
+          </td></tr>
+        <% } %>
+      </tbody></table></div>
+    </section>
+  </main>
+</div>
+<%- include('partials/footer') %>
+

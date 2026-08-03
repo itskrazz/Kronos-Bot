@@ -1,0 +1,17 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="page-heading"><div><span class="eyebrow">SYSTEM ACCOUNTABILITY</span><h1>Audit log</h1><p>Immutable chronological records of command actions.</p></div></div>
+    <%- include('partials/flash') %>
+    <section class="panel">
+      <div class="table-wrap"><table><thead><tr><th>Time</th><th>Action</th><th>Actor</th><th>Target</th><th>Details</th></tr></thead><tbody>
+        <% if (!audit.length) { %><tr><td colspan="5" class="empty-cell">No audit events recorded.</td></tr><% } %>
+        <% for (const item of audit) { %><tr><td><%= formatDateTime(item.created_at) %></td><td><span class="action-chip"><%= item.action %></span></td><td><%= item.actor_discord_id || 'System' %></td><td><%= item.target_type || '—' %><small class="table-sub"><%= item.target_id || '' %></small></td><td><code class="json-code"><%= JSON.stringify(item.details) %></code></td></tr><% } %>
+      </tbody></table></div>
+    </section>
+  </main>
+</div>
+<%- include('partials/footer') %>
+

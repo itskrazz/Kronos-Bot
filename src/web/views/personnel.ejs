@@ -1,0 +1,68 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="profile-heading">
+      <div class="profile-mark"><%= record.discord_username.slice(0, 1).toUpperCase() %></div>
+      <div><span class="eyebrow"><%= personnelBranch.abbreviation %> PERSONNEL FILE</span><h1><%= record.rank_code %> <%= record.discord_username %></h1><p><%= record.rank_name %> • <%= record.rank_paygrade %> • <%= record.unit || 'Unit unassigned' %></p></div>
+      <span class="status status-<%= record.status %>"><%= record.status %></span>
+    </div>
+    <%- include('partials/flash') %>
+    <section class="identity-grid">
+      <article><small>Discord ID</small><strong><%= record.discord_user_id %></strong></article>
+      <article><small>Roblox identity</small><strong><%= record.roblox_username || 'Not verified' %></strong></article>
+      <article><small>Group role</small><strong><%= record.roblox_group_role || 'Not synchronized' %></strong></article>
+      <article><small>Entered service</small><strong><%= formatDate(record.joined_at) %></strong></article>
+      <article><small>Specialty</small><strong><%= record.specialty || 'Unassigned' %></strong></article>
+      <article><small>Last updated</small><strong><%= formatDate(record.updated_at) %></strong></article>
+    </section>
+
+    <div class="dashboard-grid profile-grid">
+      <section class="panel panel-wide">
+        <div class="panel-heading"><div><span class="eyebrow">OFFICIAL RECORD</span><h2>Service history</h2></div><span class="count-chip"><%= history.length %> entries</span></div>
+        <div class="timeline">
+          <% if (!history.length) { %><p class="empty-copy">No service-history entries yet.</p><% } %>
+          <% for (const item of history) { %>
+            <article><div class="timeline-mark"><span></span></div><div class="timeline-copy"><div><strong><%= item.title %></strong><span class="record-type"><%= item.record_type.replaceAll('_', ' ') %></span></div><p><%= item.details || 'No additional details.' %></p><small><%= formatDateTime(item.created_at) %><%= item.created_by ? ` • Recorded by ${item.created_by}` : '' %></small></div></article>
+          <% } %>
+        </div>
+      </section>
+
+      <div class="stack">
+        <section class="panel compact-panel">
+          <div class="panel-heading"><div><span class="eyebrow">RANK ACTION</span><h2>Update rank</h2></div></div>
+          <form method="post" action="/dashboard/<%= guild.id %>/personnel/<%= record.discord_user_id %>/rank" class="stack-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label><span>New rank</span><select name="rank_code"><% for (const rank of branch.ranks) { %><option value="<%= rank.code %>" <%= rank.code === record.rank_code ? 'selected' : '' %>><%= rank.paygrade %> • <%= rank.code %> — <%= rank.name %></option><% } %></select></label>
+            <label><span>Reason / order</span><textarea name="reason" rows="3" maxlength="500" placeholder="Promotion order or administrative reason"></textarea></label>
+            <button class="button button-primary" type="submit">Save rank action</button>
+          </form>
+        </section>
+
+        <section class="panel compact-panel">
+          <div class="panel-heading"><div><span class="eyebrow">DUTY CONTROL</span><h2>Change status</h2></div></div>
+          <form method="post" action="/dashboard/<%= guild.id %>/personnel/<%= record.discord_user_id %>/status" class="stack-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label><span>Status</span><select name="status"><% for (const statusOption of ['active','reserve','loa','retired','discharged']) { %><option value="<%= statusOption %>" <%= record.status === statusOption ? 'selected' : '' %>><%= statusOption.toUpperCase() %></option><% } %></select></label>
+            <label><span>Reason</span><textarea name="reason" rows="2" maxlength="500"></textarea></label>
+            <button class="button button-secondary" type="submit">Update duty status</button>
+          </form>
+        </section>
+
+        <section class="panel compact-panel">
+          <div class="panel-heading"><div><span class="eyebrow">NEW ENTRY</span><h2>Add service record</h2></div></div>
+          <form method="post" action="/dashboard/<%= guild.id %>/personnel/<%= record.discord_user_id %>/service" class="stack-form">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <label><span>Type</span><select name="type"><option value="training">Training</option><option value="award">Award</option><option value="discipline">Discipline</option><option value="note">Administrative note</option></select></label>
+            <label><span>Title</span><input name="title" maxlength="100" required></label>
+            <label><span>Details</span><textarea name="details" rows="3" maxlength="1000"></textarea></label>
+            <button class="button button-secondary" type="submit">Add official entry</button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<%- include('partials/footer') %>
+

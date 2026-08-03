@@ -1,0 +1,33 @@
+<%- include('partials/head', { title }) %>
+<%- include('partials/topbar') %>
+<div class="app-shell">
+  <%- include('partials/sidebar') %>
+  <main id="main-content" class="dashboard-main">
+    <div class="page-heading"><div><span class="eyebrow">COMMAND OVERVIEW</span><h1>Personnel readiness</h1><p><%= branch.motto %> • Updated in real time</p></div><a class="button button-primary" href="/dashboard/<%= guild.id %>/roster#add-personnel">Add personnel</a></div>
+    <%- include('partials/flash') %>
+    <section class="stat-grid" aria-label="Personnel statistics">
+      <article><small>Total force</small><strong><%= stats.total %></strong><span>All records</span></article>
+      <article><small>Active</small><strong><%= stats.active %></strong><span>Current strength</span></article>
+      <article><small>On leave</small><strong><%= stats.on_loa %></strong><span><%= loas.length %> pending requests</span></article>
+      <article><small>Roblox synced</small><strong><%= stats.roblox_verified %></strong><span><%= config.roblox_enabled ? 'Verification enabled' : 'Optional integration' %></span></article>
+    </section>
+    <div class="dashboard-grid">
+      <section class="panel panel-wide">
+        <div class="panel-heading"><div><span class="eyebrow">ACTIVE ROSTER</span><h2>Personnel</h2></div><a href="/dashboard/<%= guild.id %>/roster">View all</a></div>
+        <div class="table-wrap"><table><thead><tr><th>Member</th><th>Rank</th><th>Unit</th><th>Status</th></tr></thead><tbody>
+          <% if (!roster.length) { %><tr><td colspan="4" class="empty-cell">No personnel records yet.</td></tr><% } %>
+          <% for (const item of roster) { %><tr><td><a class="member-link" href="/dashboard/<%= guild.id %>/personnel/<%= item.discord_user_id %>"><span class="mini-avatar"><%= item.discord_username.slice(0, 1).toUpperCase() %></span><span><strong><%= item.discord_username %></strong><small><%= item.roblox_username || 'Discord only' %></small></span></a></td><td><span class="rank-chip"><%= item.rank_code %></span> <%= item.rank_paygrade %></td><td><%= item.unit || 'Unassigned' %></td><td><span class="status status-<%= item.status %>"><%= item.status %></span></td></tr><% } %>
+        </tbody></table></div>
+      </section>
+      <section class="panel">
+        <div class="panel-heading"><div><span class="eyebrow">COMMAND ACTIVITY</span><h2>Audit trail</h2></div><a href="/dashboard/<%= guild.id %>/audit">View all</a></div>
+        <div class="activity-list">
+          <% if (!audit.length) { %><p class="empty-copy">No recorded activity.</p><% } %>
+          <% for (const item of audit) { %><article><span class="activity-dot"></span><div><strong><%= item.action.replaceAll('.', ' ') %></strong><small><%= formatDateTime(item.created_at) %></small></div></article><% } %>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<%- include('partials/footer') %>
+
